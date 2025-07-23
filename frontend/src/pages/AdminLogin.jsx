@@ -9,7 +9,6 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const toast = useToast();
-    const logoUrl = "/banner.png"; // ajuste se for png
 
     const cardBg = useColorModeValue("white", "gray.800");
     const btnColor = useColorModeValue("#249ED9", "teal.400"); // Azul da sua logo
@@ -54,82 +53,82 @@ function Login() {
         >
             <Box
                 bg={cardBg}
-                p={10}
                 rounded="2xl"
                 shadow="xl"
                 maxW="sm"
                 w="100%"
                 border="1px solid #b5d7f6"
+                overflow="hidden" // garante que nada vaze
             >
-                <Flex align="center" justify="center" mb={3}>
-                    <Box w="100%" mb={4} overflow="hidden">
-                        <Image
-                            src={logoUrl}
-                            alt="Logo"
-                            w="100%"
-                            maxH="100px"
-                            objectFit="cover" // ou 'contain', teste os dois!
-                        />
-                    </Box>
-                </Flex>
-                <Heading mb={3} textAlign="center" fontSize="2xl" color="#249ED9">
-                    Seja Bem vindo à LocPoços!
-                </Heading>
-                <Text color="gray.500" mb={3} textAlign="center">
-                    Faça seu login
-                </Text>
+                <Box
+                    w="100%"
+                    h="110px"
+                    bgImage="url('/banner.png')" // ou o nome do novo arquivo
+                    bgRepeat="no-repeat"
+                    bgSize="cover"
+                    bgPosition="center"
+                />
 
-                <form onSubmit={handleSubmit}>
-                    <FormControl mb={4} isInvalid={!!error && !email}>
-                        <FormLabel color="gray.600">Email</FormLabel>
-                        <Input
-                            type="email"
-                            value={email}
-                            onChange={e => setEmail(e.target.value)}
-                            isRequired
-                            bg="#f4faff"
-                            border="1px solid #b5d7f6"
-                            _focus={{ borderColor: "#249ED9" }}
-                        />
-                    </FormControl>
-                    <FormControl mb={4} isInvalid={!!error && !senha}>
-                        <FormLabel color="gray.600">Senha</FormLabel>
-                        <Input
-                            type="password"
-                            value={senha}
-                            onChange={e => setSenha(e.target.value)}
-                            isRequired
-                            bg="#f4faff"
-                            border="1px solid #b5d7f6"
-                            _focus={{ borderColor: "#249ED9" }}
-                        />
-                        {error && (
-                            <FormErrorMessage>{error}</FormErrorMessage>
-                        )}
-                    </FormControl>
-                    <Button
-                        bg={btnColor}
-                        color="white"
-                        w="100%"
-                        mb={2}
-                        _hover={{ bg: "#1873a0" }}
-                        type="submit"
-                        isLoading={loading}
-                        fontWeight="bold"
-                        fontSize="lg"
-                        rounded="xl"
-                        shadow="md"
-                    >
-                        Entrar
-                    </Button>
-                </form>
-                <Box textAlign="center" mt={4}>
-                    <Link color="#249ED9" fontSize="sm" href="#" display="block" mb={1}>
-                        Ainda não tem cadastro? Cadastre-se
-                    </Link>
-                    <Link color="#249ED9" fontSize="sm" href="#" display="block">
-                        Esqueci minha senha
-                    </Link>
+                <Box p={8}> {/* Padding só aqui dentro */}
+                    <Heading mb={2} textAlign="center" fontSize="2xl" color="#249ED9">
+                        Seja Bem vindo à LocPoços!
+                    </Heading>
+                    <Text color="gray.500" mb={2} textAlign="center">
+                        Faça seu login
+                    </Text>
+
+                    <form onSubmit={handleSubmit}>
+                        <FormControl mb={4} isInvalid={!!error && !email}>
+                            <FormLabel color="gray.600">Email</FormLabel>
+                            <Input
+                                type="email"
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
+                                isRequired
+                                bg="#f4faff"
+                                border="1px solid #b5d7f6"
+                                _focus={{ borderColor: "#249ED9" }}
+                            />
+                        </FormControl>
+                        <FormControl mb={4} isInvalid={!!error && !senha}>
+                            <FormLabel color="gray.600">Senha</FormLabel>
+                            <Input
+                                type="password"
+                                value={senha}
+                                onChange={e => setSenha(e.target.value)}
+                                isRequired
+                                bg="#f4faff"
+                                border="1px solid #b5d7f6"
+                                _focus={{ borderColor: "#249ED9" }}
+                            />
+                            {error && (
+                                <FormErrorMessage>{error}</FormErrorMessage>
+                            )}
+                        </FormControl>
+                        <Button
+                            bg={btnColor}
+                            color="white"
+                            w="100%"
+                            mb={2}
+                            _hover={{ bg: "#1873a0" }}
+                            type="submit"
+                            isLoading={loading}
+                            fontWeight="bold"
+                            fontSize="lg"
+                            rounded="xl"
+                            shadow="md"
+                        >
+                            Entrar
+                        </Button>
+                    </form>
+                    <Box textAlign="center" mt={4}>
+                        <Link color="#249ED9" fontSize="sm" href="#" display="block" mb={1}>
+                            Ainda não tem cadastro? Cadastre-se
+                        </Link>
+                        <Link color="#249ED9" fontSize="sm" href="#" display="block">
+                            Esqueci minha senha
+                        </Link>
+                    </Box>
                 </Box>
             </Box>
         </Flex>
