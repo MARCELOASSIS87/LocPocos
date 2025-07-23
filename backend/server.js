@@ -2,6 +2,7 @@ require('dotenv').config();
 const app = require('./app');
 const pool = require('./config/db'); // importa a pool de conexão do banco
 
+
 const PORT = process.env.PORT || 3001;
 
 // Tenta conectar no banco antes de subir o servidor
