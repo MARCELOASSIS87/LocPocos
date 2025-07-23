@@ -1,8 +1,12 @@
 const express = require('express');
-const app = express();
 const cors = require('cors');
+const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: true,
+    credentials: true
+}));
+
 app.use(express.json());
 
 // Importar rotas normalmente
