@@ -1,0 +1,65 @@
+TABELA: motoristas
+id (PK)
+nome
+email
+telefone
+senha_hash
+cpf
+data_nascimento
+cnh_numero
+cnh_validade
+cnh_data_emissao
+cnh_categoria
+cnh_foto_url
+cnh_ear (boolean)
+comprovante_endereco_url
+comprovante_endereco_nome (mot, mãe ou cônjuge)
+comprovante_vinculo_url (se não for do próprio motorista)
+foto_perfil_url
+selfie_cnh_url
+antecedentes_criminais_url
+status (pendente, aprovado, bloqueado, recusado)
+criado_em
+
+TABELA: veiculos
+id (PK)
+modelo
+marca
+ano
+placa
+renavam
+cor
+numero_seguro
+foto_principal_url
+fotos_urls (array/texto)
+status (disponível, alugado, manutenção, inativo)
+manutencao_proxima_data
+criado_em
+
+TABELA: alugueis
+id (PK)
+motorista_id (FK)
+veiculo_id (FK)
+data_inicio
+data_fim_prevista
+data_fim_real
+status (solicitado, aprovado, em uso, encerrado, recusado)
+contrato_url
+contrato_assinado_url
+criado_em
+
+TABELA: admins
+id (PK)
+nome
+email
+senha_hash
+criado_em
+
+TABELA: avaliacoes
+id (PK)
+motorista_id (FK)
+veiculo_id (FK)
+aluguel_id (FK)
+nota (1-5)
+comentario
+criado_em
