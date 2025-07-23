@@ -2,6 +2,7 @@ const pool = require('../config/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+// POST /admin/login
 exports.login = async (req, res) => {
   const { email, senha } = req.body;
   try {
@@ -17,26 +18,39 @@ exports.login = async (req, res) => {
     if (!senhaCorreta) {
       return res.status(401).json({ error: 'Senha inválida' });
     }
-    // Gera token JWT simples (ajuste segredo depois)
+    // Gera token JWT incluindo o role do admin
     const token = jwt.sign(
       { id: admin.id, nome: admin.nome, email: admin.email, role: admin.role },
-      process.env.JWT_SECRET || 'segredo_super_secreto',
-      { expiresIn: '8h' }
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
     );
-    res.json({ token, admin: { id: admin.id, nome: admin.nome, email: admin.email, role: admin.role } });
+
+    res.json({ token, admin });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao fazer login', detalhes: err.message });
   }
 };
+
+// GET /admin/
+exports.listarAdmins = async (req, res) => {
+  try {
+    const [admins] = await pool.query('SELECT id, nome, email, role, criado_em FROM admins WHERE ativo IS NULL OR ativo = true');
+    res.json(admins);
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao buscar admins' });
+  }
+};
+
+// POST /admin/
 exports.criarAdmin = async (req, res) => {
-  // Apenas super pode cadastrar novos admins
+  // Apenas superadmin pode cadastrar novos admins
   if (!req.admin || req.admin.role !== 'super') {
     return res.status(403).json({ error: 'Apenas Super Admin pode criar novos admins.' });
   }
 
-  const { nome, email, senha } = req.body;
-  if (!nome || !email || !senha) {
-    return res.status(400).json({ error: 'Nome, email e senha são obrigatórios.' });
+  const { nome, email, senha, role } = req.body;
+  if (!nome || !email || !senha || !role) {
+    return res.status(400).json({ error: 'Nome, email, senha e role são obrigatórios.' });
   }
 
   try {
@@ -46,14 +60,41 @@ exports.criarAdmin = async (req, res) => {
       return res.status(409).json({ error: 'Já existe admin com esse email.' });
     }
     // Gera hash da senha
-    const bcrypt = require('bcrypt');
     const senha_hash = await bcrypt.hash(senha, 10);
     await pool.query(
       'INSERT INTO admins (nome, email, senha_hash, role) VALUES (?, ?, ?, ?)',
-      [nome, email, senha_hash, 'comum']
+      [nome, email, senha_hash, role]
     );
     res.status(201).json({ message: 'Admin criado com sucesso.' });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao criar admin.', detalhes: err.message });
+  }
+};
+
+// PUT /admin/:id
+exports.editarAdmin = async (req, res) => {
+  const { id } = req.params;
+  const { nome, email, role } = req.body;
+
+  if (!nome || !email || !role) {
+    return res.status(400).json({ error: 'Nome, email e role são obrigatórios.' });
+  }
+
+  try {
+    await pool.query('UPDATE admins SET nome = ?, email = ?, role = ? WHERE id = ?', [nome, email, role, id]);
+    res.json({ message: 'Admin atualizado com sucesso' });
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao editar admin' });
+  }
+};
+
+// DELETE /admin/:id
+exports.excluirAdmin = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('UPDATE admins SET ativo = false WHERE id = ?', [id]);
+    res.json({ message: 'Admin desativado com sucesso' });
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao desativar admin' });
   }
 };

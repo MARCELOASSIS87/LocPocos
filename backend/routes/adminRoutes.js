@@ -1,9 +1,15 @@
 const express = require('express');
-const router = express.Router();
-const auth = require('../middlewares/auth')
+const router  = express.Router();
+const auth    = require('../middlewares/auth');
 const adminController = require('../controllers/adminController');
 
+// Login
 router.post('/login', adminController.login);
-router.post('/criar', auth, adminController.criarAdmin);
+
+// CRUD RESTful
+router.get   ('/',      auth, adminController.listarAdmins);      // Listar todos os admins
+router.post  ('/',      auth, adminController.criarAdmin);        // Criar novo admin
+router.put   ('/:id',   auth, adminController.editarAdmin);       // Editar admin por ID
+router.delete('/:id',   auth, adminController.excluirAdmin);      // Exclusão lógica por ID
 
 module.exports = router;
