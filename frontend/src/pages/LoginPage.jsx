@@ -38,7 +38,7 @@ function LoginPage() {
             const { token, admin } = data;
 
             localStorage.setItem('adminToken', token);
-
+            console.log(admin);
             toast({
                 title: "Login realizado!",
                 description: `Bem-vindo(a), ${admin.nome}`,

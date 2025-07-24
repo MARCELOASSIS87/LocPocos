@@ -10,11 +10,10 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-
         <Route
           path="/admin/dashboard"
           element={
-            <PrivateRoute role="superadmin">
+            <PrivateRoute role="super">
               <AdminDashboard />
             </PrivateRoute>
           }
