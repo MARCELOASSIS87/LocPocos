@@ -12,6 +12,9 @@ app.use(express.json());
 // Importar rotas normalmente
 const adminRoutes = require('./routes/adminRoutes');
 app.use('/admin', adminRoutes);
+const veiculosRoutes = require('./routes/veiculosRoutes');
+app.use('/veiculos', veiculosRoutes);
+
 
 // (no futuro: outras rotas)
 
