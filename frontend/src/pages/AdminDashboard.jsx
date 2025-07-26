@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import {
+import React, { useEffect, useState, useCallback, useMemo } from "react"; import {
   Box,
   Heading,
   Button,
@@ -22,9 +21,10 @@ import {
   FormLabel,
   Input,
   useDisclosure,
+  Select
 } from "@chakra-ui/react";
 import axios from "axios";
-import Sidebar from "../components/Sidebar";
+import PageLayout from '../components/PageLayout';
 
 const API = "http://localhost:3001/admin";
 
@@ -34,20 +34,23 @@ export default function AdminDashboard() {
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
   // estado do formulário (create/edit)
   const [current, setCurrent] = useState({
     id: null,
     nome: "",
     email: "",
     senha: "",
+    role: ""
   });
 
   const token = localStorage.getItem("adminToken") || "";
-  const headers = { Authorization: `Bearer ${token}` };
+  const headers = useMemo(
+    () => ({ Authorization: `Bearer ${token}` }),
+    [token]
+  );
 
   // carregar lista de admins
-  const fetchAdmins = async () => {
+  const fetchAdmins = useCallback(async () => {
     setLoading(true);
     try {
       const res = await axios.get(`${API}/`, { headers });
@@ -57,15 +60,15 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [headers, toast]);
 
   useEffect(() => {
     fetchAdmins();
-  }, []);
+  }, [fetchAdmins]);
 
   // abrir modal para criar
   const openCreate = () => {
-    setCurrent({ id: null, nome: "", email: "", senha: "" });
+    setCurrent({ id: null, nome: "", email: "", senha: "", role: "comum" });
     onOpen();
   };
 
@@ -91,7 +94,7 @@ export default function AdminDashboard() {
         // criar
         await axios.post(
           `${API}/`,
-          { nome: current.nome, email: current.email, senha: current.senha },
+          { nome: current.nome, email: current.email, senha: current.senha, role: current.role },
           { headers }
         );
         toast({ title: "Admin criado", status: "success", duration: 3000 });
@@ -116,101 +119,80 @@ export default function AdminDashboard() {
     }
   };
 
+  // configuração das colunas e renderRow
+  const columns = [
+    { header: "ID", accessor: "id" },
+    { header: "Nome", accessor: "nome" },
+    { header: "Email", accessor: "email" },
+    { header: "Criado em", accessor: "criado_em" }
+  ];
+  const renderRow = (adm) => (
+    <tr key={adm.id}>
+      <td>{adm.id}</td>
+      <td>{adm.nome}</td>
+      <td>{adm.email}</td>
+      <td>{new Date(adm.criado_em).toLocaleString()}</td>
+      <td>
+        <button onClick={() => openEdit(adm)}>Editar</button>
+        <button onClick={() => handleDelete(adm.id)}>Excluir</button>
+      </td>
+    </tr>
+  );
+
+  // JSX do formulário dentro do modal
+  const form = (
+    <>
+      <FormControl mb={3}>
+        <FormLabel>Nome</FormLabel>
+        <Input
+          value={current.nome}
+          onChange={e => setCurrent({ ...current, nome: e.target.value })}
+        />
+      </FormControl>
+      <FormControl mb={3}>
+        <FormLabel>Email</FormLabel>
+        <Input
+          type="email"
+          value={current.email}
+          onChange={e => setCurrent({ ...current, email: e.target.value })}
+        />
+      </FormControl>
+      {!current.id && (
+        <FormControl mb={3}>
+          <FormLabel>Senha</FormLabel>
+          <Input
+            type="password"
+            value={current.senha}
+            onChange={e => setCurrent({ ...current, senha: e.target.value })}
+          />
+        </FormControl>
+      )}
+      <FormControl mb={4} isRequired>
+        <FormLabel>Role</FormLabel>
+        <Select
+          value={current.role}
+          onChange={e => setCurrent({ ...current, role: e.target.value })}
+        >
+          <option value="comum">Admin Comum</option>
+          <option value="super">Super Admin</option>
+        </Select>
+      </FormControl>
+    </>
+  );
+
   return (
-    <Box display="flex">
-      <Sidebar />
-      <Box ml={{ base: 0, md: "220px" }} w="100%" p={4}></Box>
-      <Box p={6}>
-        <Heading mb={4}>Dashboard de Administradores</Heading>
-
-        <Button colorScheme="blue" mb={4} onClick={openCreate}>
-          Cadastrar Novo Admin
-        </Button>
-
-        {loading ? (
-          <Spinner />
-        ) : (
-          <Table variant="simple">
-            <Thead>
-              <Tr>
-                <Th>ID</Th>
-                <Th>Nome</Th>
-                <Th>Email</Th>
-                <Th>Criado em</Th>
-                <Th>Ações</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {admins.map((adm) => (
-                <Tr key={adm.id}>
-                  <Td>{adm.id}</Td>
-                  <Td>{adm.nome}</Td>
-                  <Td>{adm.email}</Td>
-                  <Td>{new Date(adm.criado_em).toLocaleString()}</Td>
-                  <Td>
-                    <Button size="sm" mr={2} onClick={() => openEdit(adm)}>
-                      Editar
-                    </Button>
-                    <Button size="sm" colorScheme="red" onClick={() => handleDelete(adm.id)}>
-                      Excluir
-                    </Button>
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        )}
-
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>
-              {current.id ? "Editar Administrador" : "Cadastrar Administrador"}
-            </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <FormControl mb={3}>
-                <FormLabel>Nome</FormLabel>
-                <Input
-                  value={current.nome}
-                  onChange={(e) => setCurrent({ ...current, nome: e.target.value })}
-                />
-              </FormControl>
-              <FormControl mb={3}>
-                <FormLabel>Email</FormLabel>
-                <Input
-                  type="email"
-                  value={current.email}
-                  onChange={(e) => setCurrent({ ...current, email: e.target.value })}
-                />
-              </FormControl>
-              {!current.id && (
-                <FormControl mb={3}>
-                  <FormLabel>Senha</FormLabel>
-                  <Input
-                    type="password"
-                    value={current.senha}
-                    onChange={(e) => setCurrent({ ...current, senha: e.target.value })}
-                  />
-                </FormControl>
-              )}
-            </ModalBody>
-
-            <ModalFooter>
-              <Button onClick={onClose} mr={3}>
-                Cancelar
-              </Button>
-              <Button
-                colorScheme="blue"
-                onClick={handleSubmit}
-                isLoading={submitting}
-              >
-                {current.id ? "Salvar" : "Cadastrar"}
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      </Box>
-    </Box>
+    <PageLayout
+      title="Administradores"
+      isOpen={isOpen}
+      onOpen={openCreate}
+      onClose={onClose}
+      loading={loading}
+      submitting={submitting}
+      items={admins}
+      columns={columns}
+      renderRow={renderRow}
+      childrenModal={form}
+      handleSubmit={handleSubmit}
+    />
   );
 }

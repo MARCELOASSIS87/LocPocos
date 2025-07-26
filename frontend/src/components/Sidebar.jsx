@@ -1,139 +1,90 @@
+// src/components/Sidebar.jsx
+import React from "react";
 import {
   Box,
   VStack,
   Link,
-  Text,
-  IconButton,
-  Drawer,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerHeader,
-  DrawerBody,
-  useDisclosure,
-  useBreakpointValue
+  Text
 } from "@chakra-ui/react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
-import { FiMenu } from "react-icons/fi";
-import { jwtDecode } from "jwt-decode";
+
+function decodeToken(token) {
+  try {
+    const base64 = token.split(".")[1];
+    const json = atob(base64.replace(/-/g, "+").replace(/_/g, "/"));
+    return JSON.parse(json);
+  } catch {
+    return {};
+  }
+}
 
 export default function Sidebar() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const isMobile = useBreakpointValue({ base: true, md: false });
-
+  const location = useLocation();
   const token = localStorage.getItem("adminToken");
-  let role = null;
-  let nome = "";
+  const { role = null, nome = "" } = token ? decodeToken(token) : {};
 
-  if (token) {
-    try {
-      const payload = jwtDecode(token);
-      role = payload.role;
-      nome = payload.nome;
-    } catch {
-        //
-    }
+  // monta o menu conforme o role, seguindo o escopo
+  let menuLinks = [];
+
+  if (role === "super") {
+    menuLinks = [
+      { to: "/admin/dashboard", label: "Dashboard" },
+      { to: "/admin/gestao-motoristas", label: "Gestão de Motoristas" },
+      { to: "/admin/gestao-veiculos", label: "Gestão de Veículos" },
+      { to: "/admin/solicitacoes", label: "Solicitações de Aluguel" },
+      { to: "/admin/contratos", label: "Contratos" },
+      { to: "/admin/devolucoes", label: "Devoluções" },
+      { to: "/admin/relatorios", label: "Relatórios" },
+    ];
+  } else if (role === "admin") {
+    menuLinks = [
+      { to: "/admin/gestao-motoristas", label: "Gestão de Motoristas" },
+      { to: "/admin/gestao-veiculos", label: "Gestão de Veículos" },
+      { to: "/admin/solicitacoes", label: "Solicitações de Aluguel" },
+      { to: "/admin/contratos", label: "Contratos" },
+      { to: "/admin/devolucoes", label: "Devoluções" },
+      { to: "/admin/relatorios", label: "Relatórios" },
+    ];
+  } else if (role === "motorista") {
+    menuLinks = [
+    ];
   }
 
-  const location = useLocation();
-
-  const menuLinks = [
-    role === "super" && {
-      to: "/admin/gestao-admins",
-      label: "Gestão de Admins"
-    },
-    {
-      to: "/admin/dashboard",
-      label: "Dashboard"
-    },
-    (role === "admin" || role === "super") && {
-      to: "/admin/home",
-      label: "Home Admin"
-    }
-    // Adicione outros menus conforme role
-  ].filter(Boolean);
-
-  // Sidebar conteúdo (reutilizável para Drawer e fixo)
-  const sidebarContent = (
+  return (
     <Box
+      as="nav"
+      position="fixed"
+      top={0}
+      left={0}
       h="100vh"
       w="220px"
       bg="#e8f4fc"
       px={4}
       py={6}
       boxShadow="lg"
-      position="relative"
+      zIndex={100}
     >
       <Text mb={8} fontWeight="bold" fontSize="xl" color="#249ED9">
         LocPoços
       </Text>
       <VStack spacing={4} align="stretch">
-        {menuLinks.map((item) => (
+        {menuLinks.map(item => (
           <Link
             key={item.to}
             as={RouterLink}
             to={item.to}
-            color={
-              location.pathname === item.to ? "#249ED9" : "gray.700"
-            }
-            fontWeight={
-              location.pathname === item.to ? "bold" : "normal"
-            }
-            onClick={isMobile ? onClose : undefined}
+            color={location.pathname === item.to ? "#249ED9" : "gray.700"}
+            fontWeight={location.pathname === item.to ? "bold" : "normal"}
           >
             {item.label}
           </Link>
         ))}
       </VStack>
-      <Text mt={12} color="gray.600" fontSize="sm">
-        {nome && `Logado como: ${nome}`}
-      </Text>
-    </Box>
-  );
-
-  // Mobile: menu hamburguer
-  if (isMobile) {
-    return (
-      <>
-        <IconButton
-          icon={<FiMenu />}
-          aria-label="Abrir menu"
-          position="fixed"
-          top={4}
-          left={4}
-          zIndex={200}
-          onClick={onOpen}
-          size="lg"
-          colorScheme="blue"
-          bg="white"
-          borderRadius="full"
-        />
-        <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
-          <DrawerOverlay />
-          <DrawerContent maxW="220px">
-            <DrawerHeader borderBottomWidth="1px">Menu</DrawerHeader>
-            <DrawerBody p={0}>{sidebarContent}</DrawerBody>
-          </DrawerContent>
-        </Drawer>
-      </>
-    );
-  }
-
-  // Desktop: sidebar fixa
-  return (
-    <Box
-      as="nav"
-      h="100vh"
-      w="220px"
-      bg="#e8f4fc"
-      px={4}
-      py={6}
-      boxShadow="lg"
-      position="fixed"
-      left={0}
-      top={0}
-      zIndex={100}
-    >
-      {sidebarContent}
+      {nome && (
+        <Text mt={12} color="gray.600" fontSize="sm">
+          Logado como: {nome}
+        </Text>
+      )}
     </Box>
   );
 }

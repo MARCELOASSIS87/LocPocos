@@ -39,9 +39,23 @@ export default function PrivateRoute({ role, children }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (role && user.role !== role) {
-    console.warn(`⛔ Role mismatch: esperado="${role}", recebido="${user.role}"`);
-    return <Navigate to="/login" replace />;
+  if (role) {
+    // se passou um array de roles, verifica se o user.role está incluído
+    if (Array.isArray(role)) {
+      if (!role.includes(user.role)) {
+        console.warn(
+          `⛔ Role mismatch: esperado=[${role.join(', ')}], recebido="${user.role}"`
+        );
+        return <Navigate to="/login" replace />;
+      }
+    }
+    // se passou só uma string, faz a checagem normal
+    else if (user.role !== role) {
+      console.warn(
+        `⛔ Role mismatch: esperado="${role}", recebido="${user.role}"`
+      );
+      return <Navigate to="/login" replace />;
+    }
   }
 
   console.log('✔️ Autenticado OK — renderizando rota protegida');
