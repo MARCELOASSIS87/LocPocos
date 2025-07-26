@@ -19,8 +19,14 @@ const upload = multer({ storage });
 // Rotas de CRUD de veículos
 router.get('/', veiculosController.listarVeiculos);
 router.get('/:id', veiculosController.obterVeiculo);
-router.post('/', upload.single('imagem'), veiculosController.criarVeiculo);
-router.put('/:id', upload.single('imagem'), veiculosController.editarVeiculo);
+router.post('/', upload.fields([
+  { name: 'foto_principal', maxCount: 1 },
+  { name: 'fotos', maxCount: 10 }
+]), veiculosController.criarVeiculo);
+router.put('/:id', upload.fields([
+  { name: 'foto_principal', maxCount: 1 },
+  { name: 'fotos', maxCount: 10 }
+]), veiculosController.editarVeiculo);
 router.delete('/:id', veiculosController.excluirVeiculo);
 
 module.exports = router;

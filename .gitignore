@@ -6,3 +6,4 @@ node_modules/
 
 # Ignorar pastas de uploads
 uploads/
+!uploads/.gitkeep

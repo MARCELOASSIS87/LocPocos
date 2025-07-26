@@ -31,26 +31,66 @@ exports.obterVeiculo = async (req, res) => {
 
 // Criar novo veículo
 exports.criarVeiculo = async (req, res) => {
-  const { marca, modelo, ano, status } = req.body;
-  let foto_url = null;
-  if (req.file) {
-    foto_url = `/uploads/veiculos/${req.file.filename}`;
+   const {
+    marca,
+    modelo,
+    ano,
+    placa,
+    renavam,
+    cor,
+    numero_seguro,
+    status,
+    manutencao_proxima_data
+  } = req.body;
+
+  let foto_principal_url = null;
+  let fotos_urls = null;
+
+  if (req.files && req.files.foto_principal) {
+    foto_principal_url = `/uploads/veiculos/${req.files.foto_principal[0].filename}`;
   }
+  if (req.files && req.files.fotos) {
+    fotos_urls = req.files.fotos
+      .map(f => `/uploads/veiculos/${f.filename}`)
+      .join(',');
+  }
+
   if (!marca || !modelo || !ano || !status) {
-    return res.status(400).json({ error: 'Marca, modelo, ano e status são obrigatórios.' });
+    return res
+      .status(400)
+      .json({ error: 'Marca, modelo, ano e status são obrigatórios.' });
   }
+
   try {
     const [result] = await pool.query(
-      'INSERT INTO veiculos (marca, modelo, ano, status, foto_url) VALUES (?, ?, ?, ?, ?)',
-      [marca, modelo, ano, status, foto_url]
+      'INSERT INTO veiculos (marca, modelo, ano, placa, renavam, cor, numero_seguro, status, manutencao_proxima_data, foto_principal_url, fotos_urls) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [
+        marca,
+        modelo,
+        ano,
+        placa,
+        renavam,
+        cor,
+        numero_seguro,
+        status,
+        manutencao_proxima_data,
+        foto_principal_url,
+        fotos_urls
+      ]
     );
     res.status(201).json({
       id: result.insertId,
       marca,
       modelo,
       ano,
+      placa,
+      renavam,
+      cor,
+      numero_seguro,
       status,
-      foto_url
+      manutencao_proxima_data,
+      foto_principal_url,
+      fotos_urls
     });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao criar veículo', detalhes: err.message });
@@ -60,27 +100,76 @@ exports.criarVeiculo = async (req, res) => {
 // Atualizar veículo existente
 exports.editarVeiculo = async (req, res) => {
   const { id } = req.params;
-  const { marca, modelo, ano, status } = req.body;
-  let foto_url;
-  if (req.file) {
-    foto_url = `/uploads/veiculos/${req.file.filename}`;
+  const {
+    marca,
+    modelo,
+    ano,
+    placa,
+    renavam,
+    cor,
+    numero_seguro,
+    status,
+    manutencao_proxima_data
+  } = req.body;
+
+  let foto_principal_url;
+  let fotos_urls;
+
+  if (req.files && req.files.foto_principal) {
+    foto_principal_url = `/uploads/veiculos/${req.files.foto_principal[0].filename}`;
   }
+  if (req.files && req.files.fotos) {
+    fotos_urls = req.files.fotos
+      .map(f => `/uploads/veiculos/${f.filename}`)
+      .join(',');
+  }
+
   if (!marca || !modelo || !ano || !status) {
     return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
   }
+
   try {
-    if (foto_url) {
-      await pool.query(
-        'UPDATE veiculos SET marca = ?, modelo = ?, ano = ?, status = ?, foto_url = ? WHERE id = ?',
-        [marca, modelo, ano, status, foto_url, id]
-      );
-    } else {
-      await pool.query(
-        'UPDATE veiculos SET marca = ?, modelo = ?, ano = ?, status = ? WHERE id = ?',
-        [marca, modelo, ano, status, id]
-      );
+    let query =
+      'UPDATE veiculos SET marca = ?, modelo = ?, ano = ?, placa = ?, renavam = ?, cor = ?, numero_seguro = ?, status = ?, manutencao_proxima_data = ?';
+    const params = [
+      marca,
+      modelo,
+      ano,
+      placa,
+      renavam,
+      cor,
+      numero_seguro,
+      status,
+      manutencao_proxima_data
+    ];
+
+    if (foto_principal_url) {
+      query += ', foto_principal_url = ?';
+      params.push(foto_principal_url);
     }
-    res.json({ id, marca, modelo, ano, status, foto_url });
+    if (fotos_urls) {
+      query += ', fotos_urls = ?';
+      params.push(fotos_urls);
+    }
+    query += ' WHERE id = ?';
+    params.push(id);
+
+    await pool.query(query, params);
+
+    res.json({
+      id,
+      marca,
+      modelo,
+      ano,
+      placa,
+      renavam,
+      cor,
+      numero_seguro,
+      status,
+      manutencao_proxima_data,
+      foto_principal_url,
+      fotos_urls
+    });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao editar veículo', detalhes: err.message });
   }

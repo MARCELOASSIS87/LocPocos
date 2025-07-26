@@ -33,6 +33,8 @@ export default function VeiculosPage() {
   const [, setError] = useState(null);
   const token = localStorage.getItem('adminToken');
   const headers = { Authorization: `Bearer ${token}` };
+  const [fotoPrincipal, setFotoPrincipal] = useState(null);
+  const [fotos, setFotos] = useState(null);
 
   const fetchVeiculos = async () => {
     setLoading(true);
@@ -92,10 +94,31 @@ export default function VeiculosPage() {
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
+      const formData = new FormData();
+      formData.append('marca', current.marca);
+      formData.append('modelo', current.modelo);
+      formData.append('ano', current.ano);
+      formData.append('placa', current.placa);
+      formData.append('renavam', current.renavam);
+      formData.append('cor', current.cor);
+      formData.append('numero_seguro', current.numero_seguro);
+      formData.append('status', current.status);
+      formData.append('manutencao_proxima_data', current.manutencao_proxima_data);
+      if (fotoPrincipal) {
+        formData.append('foto_principal', fotoPrincipal);
+      }
+      if (fotos.length) {
+        fotos.forEach(f => formData.append('fotos', f));
+      }
+
       if (current.id) {
-        await axios.put(`http://localhost:3001/veiculos/${current.id}`, current, { headers });
+        await axios.put(`http://localhost:3001/veiculos/${current.id}`, formData, {
+          headers: { ...headers, 'Content-Type': 'multipart/form-data' }
+        });
       } else {
-        await axios.post('http://localhost:3001/veiculos', current, { headers });
+        await axios.post('http://localhost:3001/veiculos', formData, {
+          headers: { ...headers, 'Content-Type': 'multipart/form-data' }
+        });
       }
       fetchVeiculos();
       onClose();
@@ -201,18 +224,12 @@ export default function VeiculosPage() {
         />
       </FormControl>
       <FormControl mb={3}>
-        <FormLabel>Foto Principal URL</FormLabel>
-        <Input
-          value={current.foto_principal_url}
-          onChange={e => setCurrent({ ...current, foto_principal_url: e.target.value })}
-        />
+        <FormLabel>Foto Principal</FormLabel>
+        <Input type="file" onChange={e => setFotoPrincipal(e.target.files[0])} />
       </FormControl>
       <FormControl mb={3}>
-        <FormLabel>Fotos (URLs separadas por vírgula)</FormLabel>
-        <Input
-          value={current.fotos_urls}
-          onChange={e => setCurrent({ ...current, fotos_urls: e.target.value })}
-        />
+        <FormLabel>Fotos da Galeria</FormLabel>
+        <Input type="file" multiple onChange={e => setFotos(Array.from(e.target.files))} />
       </FormControl>
       <FormControl mb={4}>
         <FormLabel>Status</FormLabel>

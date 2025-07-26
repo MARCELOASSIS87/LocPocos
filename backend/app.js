@@ -8,7 +8,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
-
+app.use('/uploads', express.static('uploads'));
 // Importar rotas normalmente
 const adminRoutes = require('./routes/adminRoutes');
 app.use('/admin', adminRoutes);
