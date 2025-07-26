@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react"; import
   Box,
   Heading,
   Button,
+  ButtonGroup,
   TableContainer,
   Table,
   Thead,
@@ -133,10 +134,16 @@ export default function AdminDashboard() {
       <td>{adm.nome}</td>
       <td>{adm.email}</td>
       <td>{new Date(adm.criado_em).toLocaleString()}</td>
-      <td>
-        <button onClick={() => openEdit(adm)}>Editar</button>
-        <button onClick={() => handleDelete(adm.id)}>Excluir</button>
-      </td>
+      <Td>
+        <ButtonGroup spacing="2">
+          <Button colorScheme="blue" size="sm" onClick={() => openEdit(adm)}>
+            Editar
+          </Button>
+          <Button colorScheme="red" size="sm" onClick={() => handleDelete(adm.id)}>
+            Excluir
+          </Button>
+        </ButtonGroup>
+      </Td>
     </tr>
   );
 

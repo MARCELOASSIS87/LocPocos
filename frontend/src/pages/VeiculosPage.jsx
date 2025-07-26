@@ -107,17 +107,17 @@ export default function VeiculosPage() {
       if (fotoPrincipal) {
         formData.append('foto_principal', fotoPrincipal);
       }
-      if (fotos.length) {
+      if (fotos && fotos.length) {
         fotos.forEach(f => formData.append('fotos', f));
       }
 
       if (current.id) {
         await axios.put(`http://localhost:3001/veiculos/${current.id}`, formData, {
-          headers: { ...headers, 'Content-Type': 'multipart/form-data' }
+          headers
         });
       } else {
         await axios.post('http://localhost:3001/veiculos', formData, {
-          headers: { ...headers, 'Content-Type': 'multipart/form-data' }
+          headers
         });
       }
       fetchVeiculos();
