@@ -14,10 +14,23 @@ import PageLayout from '../components/PageLayout';
 export default function VeiculosPage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [veiculos, setVeiculos] = useState([]);
-  const [current, setCurrent] = useState({ id: null, marca: '', modelo: '', ano: '', status: '' });
+  const [current, setCurrent] = useState({
+    id: null,
+    marca: '',
+    modelo: '',
+    ano: '',
+    placa: '',
+    renavam: '',
+    cor: '',
+    numero_seguro: '',
+    foto_principal_url: '',
+    fotos_urls: '',
+    status: '',
+    manutencao_proxima_data: ''
+  });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [,setError] = useState(null);
+  const [, setError] = useState(null);
   const token = localStorage.getItem('adminToken');
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -55,7 +68,20 @@ export default function VeiculosPage() {
   }, []);
 
   const openCreate = () => {
-    setCurrent({ id: null, marca: '', modelo: '', ano: '', status: '' });
+    setCurrent({
+      id: null,
+      marca: '',
+      modelo: '',
+      ano: '',
+      placa: '',
+      renavam: '',
+      cor: '',
+      numero_seguro: '',
+      foto_principal_url: '',
+      fotos_urls: '',
+      status: '',
+      manutencao_proxima_data: ''
+    });
     onOpen();
   };
   const openEdit = v => {
@@ -87,18 +113,34 @@ export default function VeiculosPage() {
 
   const columns = [
     { header: 'ID', accessor: 'id' },
-    { header: 'Marca', accessor: 'marca' },
     { header: 'Modelo', accessor: 'modelo' },
+    { header: 'Marca', accessor: 'marca' },
     { header: 'Ano', accessor: 'ano' },
-    { header: 'Status', accessor: 'status' }
+    { header: 'Placa', accessor: 'placa' },
+    { header: 'Renavam', accessor: 'renavam' },
+    { header: 'Cor', accessor: 'cor' },
+    { header: 'Número Seguro', accessor: 'numero_seguro' },
+    { header: 'Foto Principal', accessor: 'foto_principal_url' },
+    { header: 'Fotos', accessor: 'fotos_urls' },
+    { header: 'Status', accessor: 'status' },
+    { header: 'Próxima Manutenção', accessor: 'manutencao_proxima_data' },
+    { header: 'Criado em', accessor: 'criado_em' }
   ];
   const renderRow = v => (
     <tr key={v.id}>
       <td>{v.id}</td>
-      <td>{v.marca}</td>
       <td>{v.modelo}</td>
+      <td>{v.marca}</td>
       <td>{v.ano}</td>
+      <td>{v.placa}</td>
+      <td>{v.renavam}</td>
+      <td>{v.cor}</td>
+      <td>{v.numero_seguro}</td>
+      <td>{v.foto_principal_url}</td>
+      <td>{v.fotos_urls}</td>
       <td>{v.status}</td>
+      <td>{v.manutencao_proxima_data}</td>
+      <td>{v.criado_em}</td>
       <td>
         <button onClick={() => openEdit(v)}>Editar</button>
         <button onClick={() => handleDelete(v.id)}>Excluir</button>
@@ -130,6 +172,48 @@ export default function VeiculosPage() {
           onChange={e => setCurrent({ ...current, ano: e.target.value })}
         />
       </FormControl>
+      <FormControl mb={3}>
+        <FormLabel>Placa</FormLabel>
+        <Input
+          value={current.placa}
+          onChange={e => setCurrent({ ...current, placa: e.target.value })}
+        />
+      </FormControl>
+      <FormControl mb={3}>
+        <FormLabel>Renavam</FormLabel>
+        <Input
+          value={current.renavam}
+          onChange={e => setCurrent({ ...current, renavam: e.target.value })}
+        />
+      </FormControl>
+      <FormControl mb={3}>
+        <FormLabel>Cor</FormLabel>
+        <Input
+          value={current.cor}
+          onChange={e => setCurrent({ ...current, cor: e.target.value })}
+        />
+      </FormControl>
+      <FormControl mb={3}>
+        <FormLabel>Número do Seguro</FormLabel>
+        <Input
+          value={current.numero_seguro}
+          onChange={e => setCurrent({ ...current, numero_seguro: e.target.value })}
+        />
+      </FormControl>
+      <FormControl mb={3}>
+        <FormLabel>Foto Principal URL</FormLabel>
+        <Input
+          value={current.foto_principal_url}
+          onChange={e => setCurrent({ ...current, foto_principal_url: e.target.value })}
+        />
+      </FormControl>
+      <FormControl mb={3}>
+        <FormLabel>Fotos (URLs separadas por vírgula)</FormLabel>
+        <Input
+          value={current.fotos_urls}
+          onChange={e => setCurrent({ ...current, fotos_urls: e.target.value })}
+        />
+      </FormControl>
       <FormControl mb={4}>
         <FormLabel>Status</FormLabel>
         <Select
@@ -139,7 +223,16 @@ export default function VeiculosPage() {
           <option value="disponível">Disponível</option>
           <option value="alugado">Alugado</option>
           <option value="manutenção">Manutenção</option>
+          <option value="inativo">Inativo</option>
         </Select>
+      </FormControl>
+      <FormControl mb={4}>
+        <FormLabel>Próxima Manutenção</FormLabel>
+        <Input
+          type="date"
+          value={current.manutencao_proxima_data}
+          onChange={e => setCurrent({ ...current, manutencao_proxima_data: e.target.value })}
+        />
       </FormControl>
     </>
   );
