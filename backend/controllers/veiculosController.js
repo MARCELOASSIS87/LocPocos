@@ -41,10 +41,9 @@ exports.criarVeiculo = async (req, res) => {
     renavam,
     cor,
     numero_seguro,
-    status,
     manutencao_proxima_data
   } = req.body;
-
+  const status = req.body.status || 'disponível';
   let foto_principal_url = null;
   let fotos_urls = null;
 
@@ -110,10 +109,9 @@ exports.editarVeiculo = async (req, res) => {
     renavam,
     cor,
     numero_seguro,
-    status,
     manutencao_proxima_data
   } = req.body;
-
+  const status = req.body.status || 'disponível';
   let foto_principal_url;
   let fotos_urls;
 

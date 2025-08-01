@@ -6,11 +6,24 @@ import {
   FormLabel,
   Input,
   Select,
-  useDisclosure
+  useDisclosure,
+  Button,
+  ButtonGroup,
+  Td
 } from '@chakra-ui/react';
 
 import PageLayout from '../components/PageLayout';
-
+const formatDate = dateStr => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  if (Number.isNaN(date.getTime())) return dateStr;
+  return date.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit'
+  });
+};
+const IMAGE_BASE_URL = 'http://localhost:3001';
 export default function VeiculosPage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [veiculos, setVeiculos] = useState([]);
@@ -25,7 +38,7 @@ export default function VeiculosPage() {
     numero_seguro: '',
     foto_principal_url: '',
     fotos_urls: '',
-    status: '',
+    status: 'disponível',
     manutencao_proxima_data: ''
   });
   const [loading, setLoading] = useState(true);
@@ -114,14 +127,14 @@ export default function VeiculosPage() {
         fotos.forEach(f => formData.append('fotos', f));
       }
       console.log('FormData gerado:', Array.from(formData.entries()));
-       const config = {
+      const config = {
         headers: {
           // Adiciona o cabeçalho de autorização
           'Authorization': `Bearer ${token}`,
           // NÃO defina o 'Content-Type' aqui. O Axios fará isso por você.
         }
       };
-       if (current.id) {
+      if (current.id) {
         // Passa o objeto de configuração para o Axios
         await axios.put(`http://localhost:3001/veiculos/${current.id}`, formData, config);
       } else {
@@ -155,7 +168,8 @@ export default function VeiculosPage() {
     { header: 'Fotos', accessor: 'fotos_urls' },
     { header: 'Status', accessor: 'status' },
     { header: 'Próxima Manutenção', accessor: 'manutencao_proxima_data' },
-    { header: 'Criado em', accessor: 'criado_em' }
+    { header: 'Criado em', accessor: 'criado_em' },
+    { header: 'Ações' }
   ];
   const renderRow = v => (
     <tr key={v.id}>
@@ -167,14 +181,38 @@ export default function VeiculosPage() {
       <td>{v.renavam}</td>
       <td>{v.cor}</td>
       <td>{v.numero_seguro}</td>
-      <td>{v.foto_principal_url}</td>
-      <td>{v.fotos_urls}</td>
-      <td>{v.status}</td>
-      <td>{v.manutencao_proxima_data}</td>
-      <td>{v.criado_em}</td>
       <td>
-        <button onClick={() => openEdit(v)}>Editar</button>
-        <button onClick={() => handleDelete(v.id)}>Excluir</button>
+        {v.foto_principal_url && (
+          <img
+            src={`${IMAGE_BASE_URL}${v.foto_principal_url}`}
+            alt="Foto principal"
+            style={{ width: '60px', height: 'auto' }}
+          />
+        )}
+      </td>
+      <td>
+        {v.fotos_urls &&
+          v.fotos_urls.split(',').map((url, idx) => (
+            <img
+              key={idx}
+              src={`${IMAGE_BASE_URL}${url}`}
+              alt={`Foto ${idx + 1}`}
+              style={{ width: '60px', height: 'auto', marginRight: '4px' }}
+            />
+          ))}
+      </td>
+      <td>{v.status}</td>
+      <td>{formatDate(v.manutencao_proxima_data)}</td>
+      <td>{formatDate(v.criado_em)}</td>
+      <td>
+        <ButtonGroup spacing="2">
+          <Button colorScheme="blue" size="sm" onClick={() => openEdit(v)}>
+            Editar
+          </Button>
+          <Button colorScheme="red" size="sm" onClick={() => handleDelete(v.id)}>
+            Excluir
+          </Button>
+        </ButtonGroup>
       </td>
     </tr>
   );
