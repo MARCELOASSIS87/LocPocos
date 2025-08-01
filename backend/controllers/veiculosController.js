@@ -4,7 +4,7 @@ const pool = require('../config/db');
 exports.listarVeiculos = async (req, res) => {
   try {
     const [veiculos] = await pool.query(
-      'SELECT * FROM veiculos'
+      'SELECT * FROM veiculos WHERE ativo = 1'
     );
     res.json(veiculos);
   } catch (err) {

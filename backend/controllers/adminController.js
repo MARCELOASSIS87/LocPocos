@@ -34,7 +34,9 @@ exports.login = async (req, res) => {
 // GET /admin/
 exports.listarAdmins = async (req, res) => {
   try {
-    const [admins] = await pool.query('SELECT id, nome, email, role, criado_em FROM admins WHERE ativo IS NULL OR ativo = true');
+    const [admins] = await pool.query(
+      'SELECT id, nome, email, role, criado_em FROM admins WHERE ativo IS NULL OR ativo = 1'
+    );
     res.json(admins);
   } catch (err) {
     res.status(500).json({ error: 'Erro ao buscar admins' });
@@ -92,8 +94,7 @@ exports.editarAdmin = async (req, res) => {
 exports.excluirAdmin = async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.query('UPDATE admins SET ativo = false WHERE id = ?', [id]);
-    res.json({ message: 'Admin desativado com sucesso' });
+    await pool.query('UPDATE admins SET ativo = 0 WHERE id = ?', [id]); res.json({ message: 'Admin desativado com sucesso' });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao desativar admin' });
   }

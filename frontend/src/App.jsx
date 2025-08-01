@@ -6,6 +6,7 @@ import { Box } from '@chakra-ui/react';
 import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/AdminDashboard';
 import VeiculosPage from './pages/VeiculosPage';
+import MotoristasPage from './pages/MotoristasPage';
 import PrivateRoute from './components/PrivateRoute';
 import Sidebar from './components/Sidebar';
 
@@ -41,6 +42,14 @@ function Layout() {
               </PrivateRoute>
             }
           />          
+          <Route
+            path="/admin/gestao-motoristas"
+            element={
+              <PrivateRoute role={['super', 'admin']}>
+                <MotoristasPage />
+              </PrivateRoute>
+            }
+          />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Box>

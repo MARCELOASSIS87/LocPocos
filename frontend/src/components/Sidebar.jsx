@@ -47,6 +47,7 @@ export default function Sidebar() {
     ];
   } else if (role === "motorista") {
     menuLinks = [
+      { to: "/motorista/dashboard", label: "Dashboard" }
     ];
   }
 

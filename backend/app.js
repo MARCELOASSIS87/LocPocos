@@ -13,7 +13,8 @@ const adminRoutes = require('./routes/adminRoutes');
 app.use('/admin', adminRoutes);
 const veiculosRoutes = require('./routes/veiculosRoutes');
 app.use('/veiculos', veiculosRoutes);
-
+const motoristasRoutes = require('./routes/motoristasRoutes');
+app.use('/motoristas', motoristasRoutes);
 
 // (no futuro: outras rotas)
 
