@@ -9,7 +9,8 @@ import {
   useDisclosure,
   Button,
   ButtonGroup,
-  Td
+  Td,
+  Tr
 } from '@chakra-ui/react';
 
 import PageLayout from '../components/PageLayout';
@@ -156,7 +157,6 @@ export default function VeiculosPage() {
   };
 
   const columns = [
-    { header: 'ID', accessor: 'id' },
     { header: 'Modelo', accessor: 'modelo' },
     { header: 'Marca', accessor: 'marca' },
     { header: 'Ano', accessor: 'ano' },
@@ -168,20 +168,19 @@ export default function VeiculosPage() {
     { header: 'Fotos', accessor: 'fotos_urls' },
     { header: 'Status', accessor: 'status' },
     { header: 'Próxima Manutenção', accessor: 'manutencao_proxima_data' },
-    { header: 'Criado em', accessor: 'criado_em' },
-    { header: 'Ações' }
+    
+    
   ];
   const renderRow = v => (
-    <tr key={v.id}>
-      <td>{v.id}</td>
-      <td>{v.modelo}</td>
-      <td>{v.marca}</td>
-      <td>{v.ano}</td>
-      <td>{v.placa}</td>
-      <td>{v.renavam}</td>
-      <td>{v.cor}</td>
-      <td>{v.numero_seguro}</td>
-      <td>
+    <Tr key={v.id}>      
+      <Td>{v.modelo}</Td>
+      <Td>{v.marca}</Td>
+      <Td>{v.ano}</Td>
+      <Td>{v.placa}</Td>
+      <Td>{v.renavam}</Td>
+      <Td>{v.cor}</Td>
+      <Td>{v.numero_seguro}</Td>
+      <Td>
         {v.foto_principal_url && (
           <img
             src={`${IMAGE_BASE_URL}${v.foto_principal_url}`}
@@ -189,8 +188,8 @@ export default function VeiculosPage() {
             style={{ width: '60px', height: 'auto' }}
           />
         )}
-      </td>
-      <td>
+      </Td>
+      <Td>
         {v.fotos_urls &&
           v.fotos_urls.split(',').map((url, idx) => (
             <img
@@ -200,11 +199,10 @@ export default function VeiculosPage() {
               style={{ width: '60px', height: 'auto', marginRight: '4px' }}
             />
           ))}
-      </td>
-      <td>{v.status}</td>
-      <td>{formatDate(v.manutencao_proxima_data)}</td>
-      <td>{formatDate(v.criado_em)}</td>
-      <td>
+      </Td>
+      <Td>{v.status}</Td>
+      <Td>{formatDate(v.manutencao_proxima_data)}</Td>      
+      <Td>
         <ButtonGroup spacing="2">
           <Button colorScheme="blue" size="sm" onClick={() => openEdit(v)}>
             Editar
@@ -213,8 +211,8 @@ export default function VeiculosPage() {
             Excluir
           </Button>
         </ButtonGroup>
-      </td>
-    </tr>
+      </Td>
+    </Tr>
   );
 
   const form = (
