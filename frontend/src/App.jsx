@@ -7,13 +7,14 @@ import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/AdminDashboard';
 import VeiculosPage from './pages/VeiculosPage';
 import MotoristasPage from './pages/MotoristasPage';
+import CadastroMotorista from './pages/CadastroMotorista';
 import PrivateRoute from './components/PrivateRoute';
 import Sidebar from './components/Sidebar';
 
 function Layout() {
   // 🔥 Agora useLocation está DENTRO do <BrowserRouter>
   const location = useLocation();
-  const showSidebar = location.pathname !== '/login';
+  const showSidebar = !['/login', '/cadastro-motorista'].includes(location.pathname);
 
   return (
     <>
@@ -25,7 +26,7 @@ function Layout() {
       >
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-
+          <Route path="/cadastro-motorista" element={<CadastroMotorista />} />
           <Route
             path="/admin/dashboard"
             element={
@@ -41,7 +42,7 @@ function Layout() {
                 <VeiculosPage />
               </PrivateRoute>
             }
-          />          
+          />
           <Route
             path="/admin/gestao-motoristas"
             element={

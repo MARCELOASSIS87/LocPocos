@@ -9,6 +9,8 @@ app.use(cors({
 
 app.use('/uploads', express.static('uploads'));
 // Importar rotas normalmente
+const authRoutes = require('./routes/authRoutes');
+app.use('/', authRoutes);
 const adminRoutes = require('./routes/adminRoutes');
 app.use('/admin', adminRoutes);
 const veiculosRoutes = require('./routes/veiculosRoutes');

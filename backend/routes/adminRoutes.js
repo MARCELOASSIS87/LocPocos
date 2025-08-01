@@ -5,9 +5,6 @@ const adminController = require('../controllers/adminController');
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
-// Login
-router.post('/login', adminController.login);
-
 // CRUD RESTful
 router.get   ('/',      auth, adminController.listarAdmins);      // Listar todos os admins
 router.post  ('/',      auth, adminController.criarAdmin);        // Criar novo admin

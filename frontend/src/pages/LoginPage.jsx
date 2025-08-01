@@ -2,8 +2,7 @@ import { useState } from "react";
 import {
     Flex, Box, Heading, Input, Button, FormControl, FormLabel, FormErrorMessage, useToast, Link, Image, Text, useColorModeValue
 } from "@chakra-ui/react";
-import { useNavigate } from 'react-router-dom';
-
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 function LoginPage() {
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
@@ -20,7 +19,7 @@ function LoginPage() {
         setLoading(true);
         setError("");
         try {
-            const res = await fetch("http://localhost:3001/admin/login", {
+            const res = await fetch("http://localhost:3001/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, senha }),
@@ -35,20 +34,23 @@ function LoginPage() {
             }
 
             // Padroniza: sempre busca { token, admin }
-            const { token, admin } = data;
+            const { token, role, nome } = data;
 
-            localStorage.setItem('adminToken', token);
-            console.log(admin);
+            localStorage.setItem('token', token);
+            localStorage.setItem('role', role);
+            localStorage.setItem('nome', nome);
+
             toast({
                 title: "Login realizado!",
-                description: `Bem-vindo(a), ${admin.nome}`,
+                description: `Bem-vindo(a), ${nome}`,
                 status: "success",
                 duration: 3000,
                 isClosable: true,
             });
 
+
             // Redireciona para dashboard específica conforme role
-            switch (admin.role) {
+            switch (role) {
                 case 'super':
                     navigate('/admin/dashboard');
                     break;
@@ -56,12 +58,13 @@ function LoginPage() {
                     navigate('/admin/home');
                     break;
                 case 'motorista':
-                    navigate('/motorista/dashboard');
+                    navigate('/dashboard-motorista');
                     break;
                 default:
                     navigate('/');
                     break;
             }
+
         } catch {
             setError("Erro de conexão com o servidor");
         } finally {
@@ -148,7 +151,7 @@ function LoginPage() {
                         </Button>
                     </form>
                     <Box textAlign="center" mt={4}>
-                        <Link color="#249ED9" fontSize="sm" href="#" display="block" mb={1}>
+                        <Link as={RouterLink} to="/cadastro-motorista" color="#249ED9" fontSize="sm" display="block" mb={1}>
                             Ainda não tem cadastro? Cadastre-se
                         </Link>
                         <Link color="#249ED9" fontSize="sm" href="#" display="block">

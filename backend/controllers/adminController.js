@@ -2,35 +2,6 @@ const pool = require('../config/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-// POST /admin/login
-exports.login = async (req, res) => {
-  const { email, senha } = req.body;
-  try {
-    const [admins] = await pool.query(
-      'SELECT * FROM admins WHERE email = ? LIMIT 1',
-      [email]
-    );
-    if (admins.length === 0) {
-      return res.status(401).json({ error: 'Admin não encontrado' });
-    }
-    const admin = admins[0];
-    const senhaCorreta = await bcrypt.compare(senha, admin.senha_hash);
-    if (!senhaCorreta) {
-      return res.status(401).json({ error: 'Senha inválida' });
-    }
-    // Gera token JWT incluindo o role do admin
-    const token = jwt.sign(
-      { id: admin.id, nome: admin.nome, email: admin.email, role: admin.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '1d' }
-    );
-
-    res.json({ token, admin });
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao fazer login', detalhes: err.message });
-  }
-};
-
 // GET /admin/
 exports.listarAdmins = async (req, res) => {
   try {
