@@ -81,7 +81,7 @@ export default function VeiculosPage() {
       numero_seguro: '',
       foto_principal_url: '',
       fotos_urls: '',
-      status: '',
+      status: 'disponível',
       manutencao_proxima_data: ''
     });
     onOpen();
@@ -94,6 +94,9 @@ export default function VeiculosPage() {
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
+      console.log('Dados atuais:', current);
+      console.log('Foto principal selecionada:', fotoPrincipal);
+      console.log('Fotos selecionadas:', fotos);
       const formData = new FormData();
       formData.append('marca', current.marca);
       formData.append('modelo', current.modelo);
@@ -110,15 +113,20 @@ export default function VeiculosPage() {
       if (fotos && fotos.length) {
         fotos.forEach(f => formData.append('fotos', f));
       }
-
-      if (current.id) {
-        await axios.put(`http://localhost:3001/veiculos/${current.id}`, formData, {
-          headers
-        });
+      console.log('FormData gerado:', Array.from(formData.entries()));
+       const config = {
+        headers: {
+          // Adiciona o cabeçalho de autorização
+          'Authorization': `Bearer ${token}`,
+          // NÃO defina o 'Content-Type' aqui. O Axios fará isso por você.
+        }
+      };
+       if (current.id) {
+        // Passa o objeto de configuração para o Axios
+        await axios.put(`http://localhost:3001/veiculos/${current.id}`, formData, config);
       } else {
-        await axios.post('http://localhost:3001/veiculos', formData, {
-          headers
-        });
+        // Passa o objeto de configuração para o Axios
+        await axios.post('http://localhost:3001/veiculos', formData, config);
       }
       fetchVeiculos();
       onClose();

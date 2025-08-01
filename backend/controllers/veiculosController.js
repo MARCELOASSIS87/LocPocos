@@ -31,7 +31,9 @@ exports.obterVeiculo = async (req, res) => {
 
 // Criar novo veículo
 exports.criarVeiculo = async (req, res) => {
-   const {
+  console.log('CONTEÚDO DE REQ.BODY:', req.body);
+  console.log('CONTEÚDO DE REQ.FILES:', req.files);
+  const {
     marca,
     modelo,
     ano,
@@ -174,7 +176,7 @@ exports.editarVeiculo = async (req, res) => {
     res.status(500).json({ error: 'Erro ao editar veículo', detalhes: err.message });
   }
 };
- 
+
 // Excluir (soft delete) veículo
 exports.excluirVeiculo = async (req, res) => {
   const { id } = req.params;

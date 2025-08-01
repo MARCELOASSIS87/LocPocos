@@ -3,6 +3,8 @@ const router  = express.Router();
 const auth    = require('../middlewares/auth');
 const adminController = require('../controllers/adminController');
 
+router.use(express.json());
+router.use(express.urlencoded({ extended: true }));
 // Login
 router.post('/login', adminController.login);
 
