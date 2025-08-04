@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const veiculosController = require('../controllers/veiculosController');
-
+const auth = require('../middlewares/auth');
 // Configuração do multer para upload de imagens
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -23,6 +23,7 @@ router.post('/', upload.fields([
   { name: 'foto_principal', maxCount: 1 },
   { name: 'fotos', maxCount: 10 }
 ]), veiculosController.criarVeiculo);
+router.put('/:id/status', auth, veiculosController.atualizarStatus);
 router.put('/:id', upload.fields([
   { name: 'foto_principal', maxCount: 1 },
   { name: 'fotos', maxCount: 10 }

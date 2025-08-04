@@ -31,7 +31,7 @@ exports.criarMotorista = async (req, res) => {
 
     const [result] = await pool.query(
       `INSERT INTO motoristas (nome, email, telefone, cpf, data_nascimento, cnh_numero, cnh_validade, cnh_data_emissao, cnh_categoria, cnh_ear, senha_hash, cnh_foto_url, foto_perfil_url, selfie_cnh_url, comprovante_endereco_url, comprovante_vinculo_url, antecedentes_criminais_url, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendente')`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'em_analise')`,
       [
         nome,
         email,
@@ -122,11 +122,13 @@ exports.listarMotoristas = async (req, res) => {
     res.status(500).json({ error: 'Erro ao buscar motoristas' });
   }
 };
-
 exports.atualizarStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
-  if (!['aprovado', 'recusado', 'bloqueado', 'pendente'].includes(status)) {
+  if (!req.admin || !['admin', 'super'].includes(req.admin.role)) {
+    return res.status(403).json({ error: 'Acesso negado' });
+  }
+  if (!['aprovado', 'recusado', 'bloqueado', 'em_analise'].includes(status)) {
     return res.status(400).json({ error: 'Status inválido' });
   }
   try {
@@ -135,4 +137,13 @@ exports.atualizarStatus = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Erro ao atualizar status' });
   }
+};
+exports.bloquearMotorista = (req, res) => {
+  req.body.status = 'bloqueado';
+  return exports.atualizarStatus(req, res);
+};
+
+exports.desbloquearMotorista = (req, res) => {
+  req.body.status = 'aprovado';
+  return exports.atualizarStatus(req, res);
 };

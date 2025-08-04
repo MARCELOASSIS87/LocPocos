@@ -14,13 +14,14 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import API_BASE_URL from '../services/api';
-
+import { useNavigate } from 'react-router-dom';
 export default function MotoristaDashboard() {
   const [veiculos, setVeiculos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [marcaFilter, setMarcaFilter] = useState('');
   const [modeloFilter, setModeloFilter] = useState('');
   const [anoFilter, setAnoFilter] = useState('');
+  const navigate = useNavigate();
   const token = localStorage.getItem('token') || '';
   const headers = { Authorization: `Bearer ${token}` };
   useEffect(() => {
@@ -124,8 +125,13 @@ export default function MotoristaDashboard() {
                 <Text>Ano: {v.ano}</Text>
                 <Text>Status: {v.status}</Text>
               </VStack>
-              <Button colorScheme="blue" w="100%">Solicitar aluguel</Button>
-            </GridItem>
+              <Button
+                colorScheme="blue"
+                w="100%"
+                onClick={() => navigate(`/solicitacao-aluguel/${v.id}`)}
+              >
+                Solicitar aluguel
+              </Button>            </GridItem>
           ))}
           {filteredVeiculos.length === 0 && (
             <GridItem colSpan={3} textAlign="center">Nenhum veículo encontrado.</GridItem>

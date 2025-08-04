@@ -61,7 +61,27 @@ export default function MotoristasPage() {
             toast({ title: 'Erro ao atualizar status', status: 'error', duration: 3000 });
         }
     };
+    const bloquearMotorista = async (id) => {
+        try {
+            await axios.put(`${API_BASE_URL}/motoristas/${id}/bloquear`, {}, { headers });
+            toast({ title: 'Motorista bloqueado', status: 'success', duration: 3000 });
+            fetchMotoristas();
+        } catch (err) {
+            console.error('Erro ao bloquear motorista:', err);
+            toast({ title: 'Erro ao bloquear motorista', status: 'error', duration: 3000 });
+        }
+    };
 
+    const desbloquearMotorista = async (id) => {
+        try {
+            await axios.put(`${API_BASE_URL}/motoristas/${id}/desbloquear`, {}, { headers });
+            toast({ title: 'Motorista desbloqueado', status: 'success', duration: 3000 });
+            fetchMotoristas();
+        } catch (err) {
+            console.error('Erro ao desbloquear motorista:', err);
+            toast({ title: 'Erro ao desbloquear motorista', status: 'error', duration: 3000 });
+        }
+    };
     return (
         <Box p={6}>
             <Heading mb={4}>Gestão de Motoristas</Heading>
@@ -96,6 +116,22 @@ export default function MotoristasPage() {
                                             }}
                                         >
                                             Ver detalhes
+                                        </Button>
+                                    ) : m.status === 'aprovado' ? (
+                                        <Button
+                                            size="sm"
+                                            colorScheme="red"
+                                            onClick={() => bloquearMotorista(m.id)}
+                                        >
+                                            Bloquear
+                                        </Button>
+                                    ) : m.status === 'bloqueado' ? (
+                                        <Button
+                                            size="sm"
+                                            colorScheme="green"
+                                            onClick={() => desbloquearMotorista(m.id)}
+                                        >
+                                            Desbloquear
                                         </Button>
                                     ) : (
                                         '-'

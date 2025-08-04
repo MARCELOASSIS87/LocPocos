@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const allowedStatuses = ['disponível', 'em uso', 'manutenção'];
 
 // Listar todos os veículos (ativos)
 exports.listarVeiculos = async (req, res) => {
@@ -43,7 +44,10 @@ exports.criarVeiculo = async (req, res) => {
     numero_seguro,
     manutencao_proxima_data
   } = req.body;
-  const status = req.body.status || 'disponível';
+  const status = req.body.status || 'disponivel';
+  if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({ error: 'Status inválido' });
+  }
   let foto_principal_url = null;
   let fotos_urls = null;
 
@@ -56,10 +60,10 @@ exports.criarVeiculo = async (req, res) => {
       .join(',');
   }
 
-  if (!marca || !modelo || !ano || !status) {
+  if (!marca || !modelo || !ano) {
     return res
       .status(400)
-      .json({ error: 'Marca, modelo, ano e status são obrigatórios.' });
+      .json({ error: 'Marca, modelo, ano são obrigatórios.' });
   }
 
   try {
@@ -111,7 +115,10 @@ exports.editarVeiculo = async (req, res) => {
     numero_seguro,
     manutencao_proxima_data
   } = req.body;
-  const status = req.body.status || 'disponível';
+  const status = req.body.status || 'disponivel';
+  if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({ error: 'Status inválido' });
+  }
   let foto_principal_url;
   let fotos_urls;
 
@@ -124,8 +131,8 @@ exports.editarVeiculo = async (req, res) => {
       .join(',');
   }
 
-  if (!marca || !modelo || !ano || !status) {
-    return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+  if (!marca || !modelo || !ano) {
+    return res.status(400).json({ error: 'Marca, modelo e ano são obrigatórios.' });
   }
 
   try {
@@ -186,5 +193,19 @@ exports.excluirVeiculo = async (req, res) => {
     res.json({ message: 'Veículo removido com sucesso.' });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao excluir veículo', detalhes: err.message });
+  }
+};
+// Atualizar status do veículo
+exports.atualizarStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+   if (!allowedStatuses.includes(status)) {
+    return res.status(400).json({ error: 'Status inválido' });
+  }
+  try {
+    await pool.query('UPDATE veiculos SET status = ? WHERE id = ?', [status, id]);
+    res.json({ message: 'Status atualizado com sucesso' });
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao atualizar status', detalhes: err.message });
   }
 };

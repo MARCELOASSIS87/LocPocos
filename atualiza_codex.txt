@@ -1,2 +1,3 @@
 git remote add origin https://github.com/MARCELOASSIS87/LocPocos
+git branch --set-upstream-to=origin/master work
 zip -r LocPocos.zip . -x "frontend/node_modules/*" -x "backend/node_modules/*" -x ".git/*"

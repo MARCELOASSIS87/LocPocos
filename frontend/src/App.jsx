@@ -9,6 +9,7 @@ import VeiculosPage from './pages/VeiculosPage';
 import MotoristasPage from './pages/MotoristasPage';
 import CadastroMotorista from './pages/CadastroMotorista';
 import MotoristaDashboard from './pages/MotoristaDashboard';
+import SolicitacaoAluguel from './pages/SolicitacaoAluguel';
 import PrivateRoute from './components/PrivateRoute';
 import Sidebar from './components/Sidebar';
 
@@ -60,13 +61,20 @@ function Layout() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/solicitacao-aluguel/:id"
+            element={
+              <PrivateRoute role="motorista">
+                <SolicitacaoAluguel />
+              </PrivateRoute>
+            }
+          />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Box>
     </>
   );
 }
-
 export default function App() {
   return (
     <BrowserRouter>

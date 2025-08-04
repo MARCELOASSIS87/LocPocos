@@ -26,6 +26,13 @@ const formatDate = dateStr => {
 };
 import API_BASE_URL from '../services/api';
 
+const STATUS_OPTIONS = [
+  { value: 'disponível', label: 'Disponível' },
+  { value: 'em uso', label: 'Em uso' },
+  { value: 'manutenção', label: 'Manutenção' }
+];
+const isValidStatus = status => STATUS_OPTIONS.some(opt => opt.value === status);
+
 export default function VeiculosPage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [veiculos, setVeiculos] = useState([]);
@@ -62,7 +69,7 @@ export default function VeiculosPage() {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     // função async interna
     const fetchData = async () => {
@@ -102,7 +109,10 @@ export default function VeiculosPage() {
     onOpen();
   };
   const openEdit = v => {
-    setCurrent(v);
+    setCurrent({
+      ...v,
+      status: isValidStatus(v.status) ? v.status : 'disponivel'
+    });
     onOpen();
   };
 
@@ -120,6 +130,11 @@ export default function VeiculosPage() {
       formData.append('renavam', current.renavam);
       formData.append('cor', current.cor);
       formData.append('numero_seguro', current.numero_seguro);
+      if (!isValidStatus(current.status)) {
+        alert('Status inválido.');
+        setSubmitting(false);
+        return;
+      }
       formData.append('status', current.status);
       formData.append('manutencao_proxima_data', current.manutencao_proxima_data);
       if (fotoPrincipal) {
@@ -156,7 +171,15 @@ export default function VeiculosPage() {
     await axios.delete(`${API_BASE_URL}/veiculos/${id}`, { headers });
     fetchVeiculos();
   };
-
+  const handleStatusChange = async (id, status) => {
+    if (!isValidStatus(status)) return;
+    try {
+      await axios.put(`${API_BASE_URL}/veiculos/${id}/status`, { status }, { headers });
+      setVeiculos(prev => prev.map(v => (v.id === id ? { ...v, status } : v)));
+    } catch (err) {
+      console.error(err);
+    }
+  };
   const columns = [
     { header: 'Modelo', accessor: 'modelo' },
     { header: 'Marca', accessor: 'marca' },
@@ -201,7 +224,19 @@ export default function VeiculosPage() {
             />
           ))}
       </Td>
-      <Td>{v.status}</Td>
+      <Td>
+        <Select
+          size="sm"
+          value={isValidStatus(v.status) ? v.status : 'disponivel'}
+          onChange={e => handleStatusChange(v.id, e.target.value)}
+        >
+          {STATUS_OPTIONS.map(opt => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </Select>
+      </Td>
       <Td>{formatDate(v.manutencao_proxima_data)}</Td>
       <Td>
         <ButtonGroup spacing="2">
@@ -282,10 +317,11 @@ export default function VeiculosPage() {
           value={current.status}
           onChange={e => setCurrent({ ...current, status: e.target.value })}
         >
-          <option value="disponível">Disponível</option>
-          <option value="alugado">Alugado</option>
-          <option value="manutenção">Manutenção</option>
-          <option value="inativo">Inativo</option>
+          {STATUS_OPTIONS.map(opt => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
         </Select>
       </FormControl>
       <FormControl mb={4}>
