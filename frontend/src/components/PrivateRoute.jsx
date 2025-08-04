@@ -23,7 +23,7 @@ function decodeToken(token) {
 }
 
 export default function PrivateRoute({ role, children }) {
-  const token = localStorage.getItem('adminToken');
+  const token = localStorage.getItem('token');
   console.log('🔐 PrivateRoute token:', token);
 
   if (!token) {
@@ -35,7 +35,7 @@ export default function PrivateRoute({ role, children }) {
   console.log('✅ Payload decodificado:', user);
 
   if (!user) {
-    localStorage.removeItem('adminToken');
+    localStorage.removeItem('token');
     return <Navigate to="/login" replace />;
   }
 

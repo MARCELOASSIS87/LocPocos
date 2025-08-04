@@ -39,7 +39,7 @@ exports.login = async (req, res) => {
     }
 
     const motorista = motoristas[0];
-    const senhaOk = await bcrypt.compare(senha, motorista.senha);
+    const senhaOk = await bcrypt.compare(senha, motorista.senha_hash);
     if (!senhaOk) return res.status(401).json({ error: 'Senha incorreta' });
 
     if (motorista.status !== 'aprovado') {

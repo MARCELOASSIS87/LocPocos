@@ -24,7 +24,8 @@ const formatDate = dateStr => {
     year: '2-digit'
   });
 };
-const IMAGE_BASE_URL = 'http://localhost:3001';
+import API_BASE_URL from '../services/api';
+
 export default function VeiculosPage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [veiculos, setVeiculos] = useState([]);
@@ -45,7 +46,7 @@ export default function VeiculosPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [, setError] = useState(null);
-  const token = localStorage.getItem('adminToken');
+  const token = localStorage.getItem("token") || "";
   const headers = { Authorization: `Bearer ${token}` };
   const [fotoPrincipal, setFotoPrincipal] = useState(null);
   const [fotos, setFotos] = useState(null);
@@ -53,7 +54,7 @@ export default function VeiculosPage() {
   const fetchVeiculos = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('http://localhost:3001/veiculos', { headers });
+      const { data } = await axios.get(`${API_BASE_URL}/veiculos`, { headers });
       setVeiculos(data);
     } catch (err) {
       console.error(err);
@@ -61,15 +62,15 @@ export default function VeiculosPage() {
       setLoading(false);
     }
   };
-
+  
   useEffect(() => {
     // função async interna
     const fetchData = async () => {
       setLoading(true);
       try {
         // pegamos o token aqui dentro para não precisar declarar 'headers' fora
-        const token = localStorage.getItem('adminToken');
-        const { data } = await axios.get('http://localhost:3001/veiculos', {
+        const token = localStorage.getItem("token") || "";
+        const { data } = await axios.get(`${API_BASE_URL}/veiculos`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setVeiculos(data);
@@ -137,10 +138,10 @@ export default function VeiculosPage() {
       };
       if (current.id) {
         // Passa o objeto de configuração para o Axios
-        await axios.put(`http://localhost:3001/veiculos/${current.id}`, formData, config);
+        await axios.put(`${API_BASE_URL}/veiculos/${current.id}`, formData, config);
       } else {
         // Passa o objeto de configuração para o Axios
-        await axios.post('http://localhost:3001/veiculos', formData, config);
+        await axios.post(`${API_BASE_URL}/veiculos`, formData, config);
       }
       fetchVeiculos();
       onClose();
@@ -152,7 +153,7 @@ export default function VeiculosPage() {
   };
 
   const handleDelete = async id => {
-    await axios.delete(`http://localhost:3001/veiculos/${id}`, { headers });
+    await axios.delete(`${API_BASE_URL}/veiculos/${id}`, { headers });
     fetchVeiculos();
   };
 
@@ -168,11 +169,11 @@ export default function VeiculosPage() {
     { header: 'Fotos', accessor: 'fotos_urls' },
     { header: 'Status', accessor: 'status' },
     { header: 'Próxima Manutenção', accessor: 'manutencao_proxima_data' },
-    
-    
+
+
   ];
   const renderRow = v => (
-    <Tr key={v.id}>      
+    <Tr key={v.id}>
       <Td>{v.modelo}</Td>
       <Td>{v.marca}</Td>
       <Td>{v.ano}</Td>
@@ -183,7 +184,7 @@ export default function VeiculosPage() {
       <Td>
         {v.foto_principal_url && (
           <img
-            src={`${IMAGE_BASE_URL}${v.foto_principal_url}`}
+            src={`${API_BASE_URL}${v.foto_principal_url}`}
             alt="Foto principal"
             style={{ width: '60px', height: 'auto' }}
           />
@@ -194,14 +195,14 @@ export default function VeiculosPage() {
           v.fotos_urls.split(',').map((url, idx) => (
             <img
               key={idx}
-              src={`${IMAGE_BASE_URL}${url}`}
+              src={`${API_BASE_URL}${url}`}
               alt={`Foto ${idx + 1}`}
               style={{ width: '60px', height: 'auto', marginRight: '4px' }}
             />
           ))}
       </Td>
       <Td>{v.status}</Td>
-      <Td>{formatDate(v.manutencao_proxima_data)}</Td>      
+      <Td>{formatDate(v.manutencao_proxima_data)}</Td>
       <Td>
         <ButtonGroup spacing="2">
           <Button colorScheme="blue" size="sm" onClick={() => openEdit(v)}>

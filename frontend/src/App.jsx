@@ -8,6 +8,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import VeiculosPage from './pages/VeiculosPage';
 import MotoristasPage from './pages/MotoristasPage';
 import CadastroMotorista from './pages/CadastroMotorista';
+import MotoristaDashboard from './pages/MotoristaDashboard';
 import PrivateRoute from './components/PrivateRoute';
 import Sidebar from './components/Sidebar';
 
@@ -48,6 +49,14 @@ function Layout() {
             element={
               <PrivateRoute role={['super', 'admin']}>
                 <MotoristasPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/dashboard-motorista"
+            element={
+              <PrivateRoute role="motorista">
+                <MotoristaDashboard />
               </PrivateRoute>
             }
           />

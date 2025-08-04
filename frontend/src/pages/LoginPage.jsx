@@ -3,6 +3,7 @@ import {
     Flex, Box, Heading, Input, Button, FormControl, FormLabel, FormErrorMessage, useToast, Link, Image, Text, useColorModeValue
 } from "@chakra-ui/react";
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import API_BASE_URL from '../services/api';
 function LoginPage() {
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
@@ -19,7 +20,7 @@ function LoginPage() {
         setLoading(true);
         setError("");
         try {
-            const res = await fetch("http://localhost:3001/login", {
+            const res = await fetch(`${API_BASE_URL}/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, senha }),

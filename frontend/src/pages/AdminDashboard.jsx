@@ -27,8 +27,9 @@ import React, { useEffect, useState, useCallback, useMemo } from "react"; import
 } from "@chakra-ui/react";
 import axios from "axios";
 import PageLayout from '../components/PageLayout';
+import API_BASE_URL from '../services/api';
 
-const API = "http://localhost:3001/admin";
+const API = `${API_BASE_URL}/admin`;
 
 export default function AdminDashboard() {
   const toast = useToast();
@@ -45,7 +46,7 @@ export default function AdminDashboard() {
     role: ""
   });
 
-  const token = localStorage.getItem("adminToken") || "";
+  const token = localStorage.getItem("token") || "";
   const headers = useMemo(
     () => ({ Authorization: `Bearer ${token}` }),
     [token]

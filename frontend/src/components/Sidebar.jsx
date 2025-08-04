@@ -20,7 +20,7 @@ function decodeToken(token) {
 
 export default function Sidebar() {
   const location = useLocation();
-  const token = localStorage.getItem("adminToken");
+  const token = localStorage.getItem("token");
   const { role = null, nome = "" } = token ? decodeToken(token) : {};
 
   // monta o menu conforme o role, seguindo o escopo
@@ -47,8 +47,7 @@ export default function Sidebar() {
     ];
   } else if (role === "motorista") {
     menuLinks = [
-      { to: "/motorista/dashboard", label: "Dashboard" }
-    ];
+      { to: "/dashboard-motorista", label: "Dashboard" }];
   }
 
   return (

@@ -11,6 +11,8 @@ import {
     Link
 } from '@chakra-ui/react';
 import { Link as RouterLink } from 'react-router-dom';
+import API_BASE_URL from '../services/api';
+
 
 export default function CadastroMotorista() {
     const [form, setForm] = useState({
@@ -50,7 +52,7 @@ export default function CadastroMotorista() {
             if (files[k]) data.append(k, files[k]);
         });
         try {
-            await fetch('http://localhost:3001/motoristas', { method: 'POST', body: data });
+            await fetch(`${API_BASE_URL}/motoristas`, { method: 'POST', body: data });
             toast({ title: 'Cadastro enviado para análise', status: 'success', duration: 3000 });
             setForm({
                 nome: '',
@@ -81,6 +83,7 @@ export default function CadastroMotorista() {
     return (
         <Box p={6} maxW="600px" mx="auto">
             <Heading mb={4}>Cadastro de Motorista</Heading>
+            <FormLabel>Aqui você se cadastrará e aguardará a verificação de seus documentos pela nossa equipe de consultores. Voce receberá uma mensagem no e-mail cadastrado confirmando seu cadastro</FormLabel>
             <form onSubmit={handleSubmit}>
                 <FormControl mb={3} isRequired>
                     <FormLabel>Nome completo</FormLabel>
@@ -138,7 +141,7 @@ export default function CadastroMotorista() {
                     <Input type="file" name="comprovante_endereco" onChange={handleFile} />
                 </FormControl>
                 <FormControl mb={3}>
-                    <FormLabel>Documento de Vínculo</FormLabel>
+                    <FormLabel>Documento de Vínculo (este campo é utilizado para caso o comprovante de residência não esteja em seu nome, voce enviará um docmuento comprovando seu vinculo com o nome no comprobante)</FormLabel>
                     <Input type="file" name="documento_vinculo" onChange={handleFile} />
                 </FormControl>
                 <FormControl mb={4} isRequired>

@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET
 
 exports.criarMotorista = async (req, res) => {
+  console.log('req.body:', req.body);
+  console.log('req.files:', req.files);
   const {
     nome,
     email,
@@ -28,7 +30,7 @@ exports.criarMotorista = async (req, res) => {
     const senhaCriptografada = await bcrypt.hash(senha, 10);
 
     const [result] = await pool.query(
-      `INSERT INTO motoristas (nome, email, telefone, cpf, data_nascimento, cnh_numero, cnh_validade, cnh_data_emissao, cnh_categoria, cnh_ear, senha, cnh_foto_url, foto_perfil_url, selfie_cnh_url, comprovante_endereco_url, comprovante_vinculo_url, antecedentes_criminais_url, status)
+      `INSERT INTO motoristas (nome, email, telefone, cpf, data_nascimento, cnh_numero, cnh_validade, cnh_data_emissao, cnh_categoria, cnh_ear, senha_hash, cnh_foto_url, foto_perfil_url, selfie_cnh_url, comprovante_endereco_url, comprovante_vinculo_url, antecedentes_criminais_url, status)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendente')`,
       [
         nome,
@@ -41,7 +43,7 @@ exports.criarMotorista = async (req, res) => {
         cnh_data_emissao,
         cnh_categoria,
         cnh_ear === 'true' || cnh_ear === true,
-        senhaCriptografada, // 👈 novo campo
+        senhaCriptografada,
         foto_cnh_url,
         foto_perfil_url,
         selfie_cnh_url,
@@ -54,6 +56,7 @@ exports.criarMotorista = async (req, res) => {
 
     res.status(201).json({ id: result.insertId });
   } catch (err) {
+    console.error('ERRO AO CADASTRAR MOTORISTA:', err.message);
     res.status(500).json({ error: 'Erro ao cadastrar motorista', detalhes: err.message });
   }
 };
@@ -68,7 +71,7 @@ exports.loginMotorista = async (req, res) => {
     }
 
     const motorista = rows[0];
-    const senhaValida = await bcrypt.compare(senha, motorista.senha);
+    const senhaValida = await bcrypt.compare(senha, motorista.senha_hash);
 
     if (!senhaValida) {
       return res.status(401).json({ error: 'Senha incorreta' });
@@ -95,5 +98,41 @@ exports.loginMotorista = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: 'Erro no login', detalhes: err.message });
+  }
+};
+exports.listarMotoristas = async (req, res) => {
+  const { status } = req.query;
+  try {
+    let query = `SELECT
+         id, nome, email, telefone, cpf,
+         data_nascimento, cnh_numero, cnh_validade, cnh_data_emissao,
+         cnh_categoria, cnh_ear,
+         cnh_foto_url, foto_perfil_url, selfie_cnh_url,
+         comprovante_endereco_url, comprovante_vinculo_url, antecedentes_criminais_url,
+         status
+       FROM motoristas`;
+    const params = [];
+    if (status) {
+      query += ' WHERE status = ?';
+      params.push(status);
+    }
+    const [rows] = await pool.query(query, params);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao buscar motoristas' });
+  }
+};
+
+exports.atualizarStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!['aprovado', 'recusado', 'bloqueado', 'pendente'].includes(status)) {
+    return res.status(400).json({ error: 'Status inválido' });
+  }
+  try {
+    await pool.query('UPDATE motoristas SET status = ? WHERE id = ?', [status, id]);
+    res.json({ message: 'Status atualizado com sucesso' });
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao atualizar status' });
   }
 };

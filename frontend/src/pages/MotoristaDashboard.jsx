@@ -13,8 +13,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import axios from 'axios';
-
-const IMAGE_BASE_URL = 'http://localhost:3001';
+import API_BASE_URL from '../services/api';
 
 export default function MotoristaDashboard() {
   const [veiculos, setVeiculos] = useState([]);
@@ -22,12 +21,16 @@ export default function MotoristaDashboard() {
   const [marcaFilter, setMarcaFilter] = useState('');
   const [modeloFilter, setModeloFilter] = useState('');
   const [anoFilter, setAnoFilter] = useState('');
-
+  const token = localStorage.getItem('token') || '';
+  const headers = { Authorization: `Bearer ${token}` };
   useEffect(() => {
     const fetchVeiculos = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get('http://localhost:3001/veiculos');
+        const { data } = await axios.get(
+          `${API_BASE_URL}/veiculos`,
+          { headers }
+        );
         setVeiculos(data);
       } catch (err) {
         console.error(err);
@@ -52,7 +55,7 @@ export default function MotoristaDashboard() {
   );
 
   const filteredVeiculos = veiculos.filter(v =>
-    v.status === 'disponível' &&
+    v.status === 'disponivel' &&
     (!marcaFilter || v.marca === marcaFilter) &&
     (!modeloFilter || v.modelo === modeloFilter) &&
     (!anoFilter || String(v.ano) === String(anoFilter))
@@ -106,7 +109,7 @@ export default function MotoristaDashboard() {
             <GridItem key={v.id} borderWidth="1px" borderRadius="md" p={4}>
               {v.foto_principal_url && (
                 <Image
-                  src={`${IMAGE_BASE_URL}${v.foto_principal_url}`}
+                  src={`${API_BASE_URL}${v.foto_principal_url}`}
                   alt={v.modelo}
                   w="100%"
                   h="150px"

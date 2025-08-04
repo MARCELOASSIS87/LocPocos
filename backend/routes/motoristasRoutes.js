@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const motoristasController = require('../controllers/motoristasController');
+const auth = require('../middlewares/auth');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -24,5 +25,7 @@ router.post('/', upload.fields([
   { name: 'antecedentes_criminais', maxCount: 1 }
 ]), motoristasController.criarMotorista);
 router.post('/login', motoristasController.loginMotorista);
+router.get('/', auth, motoristasController.listarMotoristas);
+router.put('/:id/status', auth, motoristasController.atualizarStatus);
 
-module.exports = router;
+module.exports = router; 
